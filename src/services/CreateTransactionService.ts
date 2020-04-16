@@ -15,6 +15,22 @@ class CreateTransactionService {
   }
 
   public execute({ title, value, type }: Request): Transaction {
+    if (title === '') {
+      throw new Error('Invalid transaction Title. Title must not be empty');
+    }
+
+    if (type !== 'income' && type !== 'outcome') {
+      throw new Error(
+        'Invalid transaction type. Type must be "income" or "outcome"',
+      );
+    }
+
+    if (value <= 0) {
+      throw new Error(
+        'Invalid transaction value. Value must be greater than zero (0)',
+      );
+    }
+
     if (type === 'outcome') {
       const balance = this.transactionsRepository.getBalance();
       if (value > balance.total) {
