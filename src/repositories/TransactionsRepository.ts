@@ -24,42 +24,20 @@ class TransactionsRepository {
   }
 
   public getBalance(): Balance {
-    const balance = this.transactions.reduce(
-      (previousBalance, currentTransaction) => {
-        return currentTransaction.type === 'income'
-          ? {
-              income: previousBalance.income + currentTransaction.value,
-              outcome: previousBalance.outcome,
-              total: previousBalance.total + currentTransaction.value,
-            }
-          : {
-              income: previousBalance.income,
-              outcome: previousBalance.outcome + currentTransaction.value,
-              total: previousBalance.total - currentTransaction.value,
-            };
-      },
-      {
-        income: 0,
-        outcome: 0,
-        total: 0,
-      },
-    );
+    const income = this.transactions
+      .filter(transaction => transaction.type === 'income')
+      .reduce((previous, current) => previous + current.value, 0);
+    const outcome = this.transactions
+      .filter(transaction => transaction.type === 'outcome')
+      .reduce((previous, current) => previous + current.value, 0);
 
-    // const incomes = this.transactions
-    //   .filter(transaction => transaction.type === 'income')
-    //   .map(transaction => transaction.value);
-    // const outcomes = this.transactions
-    //   .filter(transaction => transaction.type === 'outcome')
-    //   .map(transaction => transaction.value);
+    const total = income - outcome;
 
-    // const income = incomes.reduce((previous, current) => previous + current, 0);
-    // const outcome = outcomes.reduce(
-    //   (previous, current) => previous + current,
-    //   0,
-    // );
-    // const total = income - outcome;
-
-    return balance;
+    return {
+      income,
+      outcome,
+      total,
+    };
   }
 
   public create({ title, value, type }: CreateTransactionDTO): Transaction {
